@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+
+</body>
+
+</html>
+
+<script>
+    //数组去重
+    let arr = [1, 2, 3, 4, 4, 5, 5, 6, 6, 7, 6]
+    let arr2 = [1, 2, 3, 4, 4, 5, 5, 6, 6, 17, 6]
+    let setobj = new Set(arr)
+    arr = [...setobj]
+    console.log(setobj)
+    console.log(arr)
+
+    function maxNum(arr) {
+        let indexNum = 0
+        arr.map((item) => {
+            if (item > indexNum) {
+                indexNum = item
+            }
+        })
+        return indexNum;
+    }
+
+    let indexnum = maxNum(arr2)
+    console.log('最大值' + indexnum)
+</script>

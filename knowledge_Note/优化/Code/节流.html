@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>函数节流</title>
+    <style>
+        div {
+            font-size: 40px;
+            color: red;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div>0</div>
+    <script>
+        var a = 0;
+        var oDiv = document.getElementsByTagName('div')[0];
+        var throttle = function(fn, wait) {
+            var startTime = new Date();
+            return function() {
+                var arg = arguments;
+                var context = this;
+                var curTime = new Date();
+                // 如果达到了规定的触发时间间隔，触发 handler
+                var remaing = wait - (curTime - startTime)
+                if (remaing <= 0 || remaing > wait) { //按理说remaing足够证明已经到了时间间隔，但是为了防止客户端修改了时间所以加个条件(为什么这么加我也不懂)
+                    fn.apply(context, arg);
+                    startTime = curTime;
+                }
+            };
+        };
+        window.onmousemove = throttle(function() {
+            a++;
+            oDiv.innerText = a + "";
+        }, 2000);
+    </script>
+</body>
+
+</html>

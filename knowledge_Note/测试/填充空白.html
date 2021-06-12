@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <div style="display: flex;">
+        <div class="fill_black"></div>
+        <div style="height:100px;width:100px;background-color:blue;margin-left:300px;"></div>
+    </div>
+</body>
+
+</html>
+
+<style>
+    .fill_black {
+        margin-right: auto;
+        width: 500px;
+        height: 300px;
+        border: 1px #000 solid
+    }
+</style>
+
+<!--
+    含义
+margin:auto是具有强烈计算意味的关键字，用来计算元素对应方向应该获得的剩余空间大小
+
+填充规则
+(1) 如果一侧定值，一侧auto，则auto为剩余空间大小
+(2) 如果两侧均是auto，则平分剩余空间
+-->

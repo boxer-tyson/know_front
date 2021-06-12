@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+
+</body>
+
+</html>
+
+<script>
+    function loadFile(src, resolve) {
+        let script = document.createElement('script')
+        script.src = src
+            //加载 抛到任务队列
+        script.onload = resolve
+        document.body.appendChild(script)
+    }
+    //哪个快 哪个就先被加入到任务队列里面
+    loadFile('资源文件/被加载2.js', () => {
+        beLoadB()
+    })
+    loadFile('资源文件/被加载1.js', () => {
+        beLoadA()
+    })
+
+
+    //为了有顺序的执行
+    loadFile('资源文件/被加载1.js', () => {
+        loadFile('资源文件/被加载2.js', () => {
+            beLoadB()
+        })
+    })
+
+    console.log('主任务先执行')
+</script>

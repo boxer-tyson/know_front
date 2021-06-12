@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <div>Promise.all 判定 promise都为成功 才执行 res</div>
+    <div>Promise.allSettled 宽松处理 不一定判定全部成功 </div>
+    <div>Promise.race 哪个快执行选那个 选最快的 </div>
+</body>
+
+</html>
+
+<script>
+    const fun1 = new Promise((res, rej) => {
+        setTimeout(() => {
+            res('第1个异步')
+        }, 1000)
+    })
+    const fun2 = new Promise((res, rej) => {
+        setTimeout(() => {
+            res('第2个异步')
+        }, 4000)
+    })
+    const fun3 = new Promise((res, rej) => {
+        setTimeout(() => {
+                rej('第3个异步失败')
+            }, 1000)
+            //被catch 所以还是成功
+    }).catch(error => {
+        console.log(error)
+    })
+    const fun4 = new Promise((res, rej) => {
+            setTimeout(() => {
+                rej('第4个异步')
+            }, 1000)
+        })
+        //0.02秒超时
+    const fun5 = new Promise((res, rej) => {
+        setTimeout(() => {
+            rej('请求超过0.02秒')
+        }, 20)
+    })
+
+    Promise.all([fun1, fun2]).then(res => {
+        console.log('1 2都成功')
+    })
+    Promise.all([fun1, fun3]).then(res => {
+        console.log('1 3 都成功')
+    })
+    Promise.all([fun1, fun4]).then(res => {
+        console.log('1 4 都成功')
+    }).catch(error => {
+        console.log(error)
+    })
+
+    Promise.allSettled([fun1, fun4]).then(res => {
+        console.log('1 4 不一定都解决')
+    })
+
+    //用在是否在运行的时间内 请求到数据
+    Promise.race([fun1, fun5]).then(res => {
+        console.log('哪个快执行选那个 选最快的' + res)
+    }).catch(error => {
+        console.log(error)
+    })
+</script>

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+
+</body>
+
+</html>
+
+<script>
+    //两种方式
+
+    //工厂模式
+    function boxer(name, age) {
+        return {
+            name,
+            age,
+            info() {
+                console.log(`姓名：${this.name} 年龄:${this.age}`)
+            }
+        }
+    }
+    let man = boxer('tyson', 19)
+    man.info()
+
+    //构造函数
+    function boxer2(name) {
+        this.name = name
+        this.info = function() {
+            console.log(this.name)
+        }
+        return this
+    }
+    let man2 = boxer2('liyisi')
+    man2.info()
+</script>

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+
+</body>
+
+</html>
+
+<script>
+    "use strict";
+
+    const hd = ["houdunren", "hdcms"];
+    const keys = hd.keys();
+    console.log(keys.next());
+    console.log(keys.next());
+
+    const arr = ["a", "b", "c", "uinn"];
+
+    for (const key of arr.keys()) {
+        console.log(key);
+    }
+
+
+    for (const value of arr.values()) {
+        console.log(value);
+    }
+
+
+    const iterator = arr.entries();
+
+    let {
+        done,
+        value: [k, v]
+    } = iterator.next();
+
+    console.log(done, k, v);
+</script>

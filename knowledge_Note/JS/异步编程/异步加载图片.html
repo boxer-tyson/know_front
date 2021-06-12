@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+
+</body>
+
+</html>
+
+<script>
+    function loadImg(src, resolve, reject) {
+        let image = new Image()
+        image.src = src;
+        //onload 异步 任务
+        image.onload = () => {
+            resolve(image)
+        }
+        image.onerror = reject
+    }
+    //交给文件处理模块
+    loadImg(
+        '../任务/截图/promise执行情况.png',
+        //放到任务队列里面
+        (image) => {
+            console.log('图片加载完成')
+            document.body.appendChild(image)
+        },
+        () => {
+            console.log('图片加载失败')
+        }
+    )
+    console.log('图片异步加载')
+</script>

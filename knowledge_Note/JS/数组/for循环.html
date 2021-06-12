@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+
+</body>
+
+</html>
+
+<script>
+    //forEach使函数作用在每个数组元素上，但是没有返回值
+    let lessons = [{
+        title: '媒体查询响应式布局',
+        category: 'css'
+    }, {
+        title: 'FLEX 弹性盒模型',
+        category: 'css'
+    }, {
+        title: 'MYSQL多表查询随意操作',
+        category: 'mysql'
+    }];
+
+    lessons.forEach((item, index, array) => {
+        item.title = item.title.substr(0, 5);
+    });
+    console.log(lessons);
+    //for/in 遍历时的 key 值为数组的索引
+    lessons2 = [{
+        title: '媒体查询响应式布局',
+        category: 'css'
+    }, {
+        title: 'FLEX 弹性盒模型',
+        category: 'css'
+    }, {
+        title: 'MYSQL多表查询随意操作',
+        category: 'mysql'
+    }];
+
+    for (const key in lessons2) {
+        lessons2[key].title = lessons2[key].title.substr(0, 10);
+        console.log(`标题: ${lessons2[key].title}`);
+    }
+
+    //for/of 每次循环取其中的值而不是索引
+    let lessons3 = [{
+        title: '媒体查询响应式布局',
+        category: 'css'
+    }, {
+        title: 'FLEX 弹性盒模型',
+        category: 'css'
+    }, {
+        title: 'MYSQL多表查询随意操作',
+        category: 'mysql'
+    }];
+
+    for (const item of lessons3) {
+        console.log(`
+    标题: ${item.title}
+    栏目: ${item.category == "css" ? "前端" : "数据库"}
+  `);
+    }
+
+    const hd = ["hdcms", "houdunren"];
+
+    for (const [key, value] of hd.entries()) {
+        console.log(key, value); //这样就可以遍历了
+    }
+</script>

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="divport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <div class="table-main">
+        <table class="gridtable">
+            <thead>
+                <tr class="title">
+                    <td class="title-th" style="width: 100upx;height: 50upx;">编号</td>
+                    <td class="title-th" style="width: 200upx;height: 50upx">用户名</td>
+                    <td class="title-th" style="width: 200upx;height: 50upx">手机号</td>
+                    <td class="title-th" style="width: 200upx;height: 50upx">店号</td>
+                    <td class="title-th" style="width: 200upx;height: 50upx">店名</td>
+                    <td class="title-th" style="width: 300upx;height: 50upx">参加日期</td>
+                    <td class="title-th" style="width: 200upx;height: 50upx">打卡状态</td>
+                    <td class="title-th" style="width: 200upx;height: 50upx">核销状态</td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="(item,index) in info">
+                    <td class="body-td" style="width: 100upx;height:30upx">2323</td>
+                    <td class="body-td" style="width: 200upx;height:30upx">343</td>
+                    <td class="body-td" style="width: 200upx;height:30upx">454</td>
+                    <td class="body-td" style="width: 200upx;height:30upx">43</td>
+                    <td class="body-td" style="width: 200upx;height:30upx">sds</td>
+                    <td class="body-td" style="width: 300upx;height:30upx">rtr</td>
+                    <td class="body-td" style="width: 200upx;height:30upx">{{item.flagOne ? '已打卡':'未打卡'}}</td>
+                    <td class="body-td" style="width: 200upx;height:30upx">{{item.isWrite ? '已核销':'未核销'}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+</body>
+
+</html>
+
+<style>
+    .table-main {
+        overflow: auto;
+    }
+    
+    table.gridtable {
+        width: auto;
+        height: auto;
+        font-family: verdana, arial, sans-serif;
+        font-size: 11px;
+        color: #333333;
+        border-width: 1px;
+        border-color: #666666;
+        border-collapse: collapse;
+    }
+    
+    table.gridtable thead,
+    tbody tr {
+        display: flex;
+    }
+    
+    .title-th {
+        text-align: center;
+        font-size: 14px;
+        font-weight: bold;
+    }
+    
+    .body-td {
+        flex-shrink: 0;
+        height: 50upx;
+        display: flex;
+    }
+    
+    table.gridtable tbody {
+        display: block;
+        height: 95vh;
+        overflow: auto;
+    }
+    
+    table.gridtable th {
+        padding: 8px;
+        background-color: #dedede;
+        white-space: nowrap;
+        border: 1px solid #000;
+    }
+    
+    table.gridtable td {
+        height: 3.66upx;
+        white-space: nowrap;
+        padding: 5.33upx;
+        padding-right: 16.66upx;
+        border-bottom: 1px solid #666;
+        border-left: 1px solid #666;
+        background-color: #ffffff;
+    }
+</style>

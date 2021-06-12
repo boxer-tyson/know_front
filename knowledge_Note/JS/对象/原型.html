@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+
+</body>
+
+</html>
+
+<script>
+    let arr = ['kk', 'bb']
+        //hasOwnProperty 只看自己不看父级
+    console.log(arr.hasOwnProperty('length'))
+    console.log(arr.hasOwnProperty('concat'))
+
+    //不止检测自己 还检测父级
+    console.log('length' in arr)
+
+    let a = {
+        name: 'mike'
+    }
+    let b = {
+            title: 'boxer'
+        }
+        //设置a 的 原型是 b 
+    Object.setPrototypeOf(a, b)
+    console.log('title' in a)
+
+    const goods = [{
+        name: '蔬菜',
+        price: '5'
+    }, {
+        name: '水果',
+        price: '7'
+    }, {
+        name: '猪肉',
+        price: '19'
+    }]
+    let res = goods.reduce((obj, cur, index) => {
+        //计算
+        obj[`商品编号:${index + 1}  -  价格: ${cur['price']}`] = cur
+        return obj
+    }, {})
+    console.log(JSON.stringify(res, null, 2))
+
+    function upload(params) {
+        let options = {
+            size: 1999
+        };
+        //合并
+        options = Object.assign(options, params);
+        console.log(JSON.stringify(options, null, 2))
+    }
+    upload({
+        size: 99,
+        type: 'png'
+    })
+</script>

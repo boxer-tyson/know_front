@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <div id="app">
+        <h2>houdunren.com</h2>
+    </div>
+    <div id="app2">
+        <h1>kkkk</h1>
+    </div>
+</body>
+
+</html>
+
+<script>
+    const app = document.querySelector('#app')
+    const h2 = document.querySelector('h2')
+    app.addEventListener('click', (event) => {
+        console.log(`event.currentTarget:${event.currentTarget.nodeName}`)
+        console.log(`event.target:${event.target.nodeName}`)
+        console.log('app event')
+    })
+    h2.addEventListener('click', () => {
+        console.log(`event.currentTarget:${event.currentTarget.nodeName}`)
+        console.log(`event.target:${event.target.nodeName}`)
+        console.log(`h2 event`)
+    })
+
+    const app2 = document.querySelector('#app2')
+    const h22 = document.querySelector('h1')
+    app2.addEventListener('click', (event) => {
+        console.log(`event.currentTarget:${event.currentTarget.nodeName}`)
+        console.log(`event.target:${event.target.nodeName}`)
+        console.log('app event')
+    })
+    h22.addEventListener('click', (event) => {
+        //阻止冒泡
+        event.stopPropagation()
+        console.log(`event.currentTarget:${event.currentTarget.nodeName}`)
+        console.log(`event.target:${event.target.nodeName}`)
+        console.log(`h2 event`)
+    })
+    h22.addEventListener('click', (event) => {
+        console.log('h2 的第二个事件处理程序')
+    })
+</script>
+
+<style>
+    #app {
+        background: #34495e;
+        width: 300px;
+        padding: 30px;
+    }
+    
+    #app h2 {
+        background-color: #f1c40f;
+        margin-right: -100px;
+    }
+    
+    #app2 {
+        background: #0b82f82f;
+        width: 300px;
+        padding: 30px;
+    }
+    
+    #app2 h1 {
+        background-color: #ad1d60;
+        margin-right: -100px;
+    }
+</style>

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+
+</body>
+
+</html>
+
+<script>
+    function boxer() {
+        return new Promise(res => {
+            setTimeout(() => {
+                console.log('tyson')
+                res('kk')
+            }, 1000)
+        })
+    }
+    boxer().then(v => console.log(v))
+    boxer2()
+    async function boxer2() {
+        //await是then的简写(语法糖)
+        //let name = await 'tyson'
+        let name = await new Promise(res => {
+            setTimeout(() => {
+                console.log('ssss')
+                res('kkre')
+            }, 1000)
+        })
+        console.log(name)
+    }
+</script>

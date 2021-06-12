@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>后盾人</title>
+</head>
+
+<body></body>
+<script>
+    let p1 = new Promise((resolve, reject) => {
+            resolve("fulfilled");
+        })
+        .then(
+            value => {
+                // class Hd {
+                //   then(resolve, reject) {
+                //     setTimeout(() => {
+                //       resolve("这是对象");
+                //     }, 2000);
+                //   }
+                // }
+                return class {
+                    static then(resolve, reject) {
+                        reject("失败");
+                    }
+                };
+            },
+            reason => {}
+        )
+        .then(
+            value => {
+                console.log(value);
+            },
+            reason => {
+                console.log('我这里被调用了' + reason);
+            }
+        );
+</script>
+
+</html>

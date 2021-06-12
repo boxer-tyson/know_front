@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+
+</body>
+
+</html>
+
+<style>
+    /*媒体查询方案*/
+    
+    @media only screen and (min-device-width: 320px)and (-webkit-min-device-pixel-ratio: 2) {
+        /*针对iPhone 4, 5c,5s, 所有iPhone6的放大模式，个别iPhone6的标准模式*/
+        html {
+            font-size: 10px;
+        }
+    }
+    
+    @media only screen and (min-device-width: 375px)and (-webkit-min-device-pixel-ratio: 2) {
+        /*针对大多数iPhone6的标准模式*/
+        html {
+            font-size: 12px;
+        }
+    }
+    
+    @media only screen and (min-device-width: 375px)and (-webkit-min-device-pixel-ratio: 3) {
+        /*/针对所有iPhone6+的放大模式*/
+        html {
+            font-size: 16px;
+        }
+    }
+    
+    @media only screen and (min-device-width:412px) and (-webkit-min-device-pixel-ratio: 3) {
+        /*针对所有iPhone6+的标准模式,414px写为412px是由于三星Nexus 6为412px，可一并处理*/
+        html {
+            font-size: 20px;
+        }
+    }
+    
+    @media only screen and (-webkit-device-pixel-ratio:.75) {
+        /*低分辨率小尺寸的图片样式*/
+    }
+    
+    @media only screen and (-webkit-device-pixel-ratio:1) {
+        /*普通分辨率普通尺寸的图片样式*/
+    }
+    
+    @media only screen and (-webkit-device-pixel-ratio:1.5) {
+        /*高分辨率大尺寸的图片样式*/
+    }
+</style>

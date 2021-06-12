@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+
+</body>
+
+</html>
+
+<script>
+    let now = new Date();
+    console.log(now);
+    console.log(typeof now); //object
+    console.log(now * 1); //获取时间戳
+
+    //直接使用函数获取当前时间
+    console.log(Date());
+    console.log(typeof Date()); //string
+
+    //获取当前时间戳单位毫秒
+    console.log(Date.now());
+
+    let hd = new Date("2020-2-22 10:33:12");
+    console.log(hd * 1);
+
+    let time = new Date();
+    console.log(
+        `${time.getFullYear()}-${time.getMonth()}-${time.getDate()} ${time.getHours()}:${time.getMinutes()}:${time.getSeconds()}`
+    );
+    console.log('周几' +
+        time.getDay())
+
+    //中文格式转换
+    function dateFormat(date, format = "YYYY-MM-DD HH:mm:ss") {
+        const config = {
+            YYYY: date.getFullYear(),
+            MM: date.getMonth() + 1,
+            DD: date.getDate(),
+            HH: date.getHours(),
+            mm: date.getMinutes(),
+            ss: date.getSeconds()
+        };
+        for (const key in config) {
+            format = format.replace(key, config[key]);
+        }
+        return format;
+    }
+    console.log(dateFormat(new Date(), "YYYY年MM月DD日"));
+
+    //推荐做法
+    //     moment.js
+    // Moment.js是一个轻量级的JavaScript时间库，它方便了日常开发中对时间的操作，提高了开发效率。
+    // 更多使用方法请访问中文官网 http://momentjs.cn (opens new window)或 英文官网 https://momentjs.com
+</script>

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <!--双飞翼布局左中右三列布局，渲染顺序中间列书写在前保证提前渲染，
+        左右两列定宽，中间列自适应剩余宽度-->
+    <div class="content">
+        被爬对象
+    </div>
+    <div class="upbox">
+        向上爬
+    </div>
+</body>
+
+</html>
+
+<style>
+    .content {
+        float: left;
+        height: 400px;
+        width: 90%;
+        /*设置成width:100%就有一种div从下层往上层走的感觉*/
+        background-color: aquamarine;
+    }
+    
+    .upbox {
+        float: left;
+        background-color: blueviolet;
+        height: 100px;
+        width: 100px;
+        margin-left: -100px;
+    }
+</style>

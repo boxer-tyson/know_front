@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+
+</body>
+
+</html>
+
+<script>
+    (function() {
+        console.log('run now!')
+    })()
+
+    let arr = new Array(5).fill(false);
+    let obj = {
+        station1: '00_1',
+        station2: '00_2',
+        station3: '00_3',
+        station4: '00_4',
+        station5: '00_15',
+    }
+
+    let arr_01 = []
+    for (let item in obj) {
+        arr_01.push(obj[item])
+    }
+    console.log(arr_01)
+
+    var BBQ = {};
+    BBQ.Client = (function() {
+        var BBQClient = function() {
+            let jj = '10086'
+            this.ConnectStatus = false
+            this.onStart = function() {
+                console.log('onStart')
+            }
+
+            this.onConnect = function() {
+                console.log('onConnect')
+            }
+        }
+
+        return {
+            BBQClient
+        }
+    })();
+    //console.log(BBQ)
+    //let BBQObj = new BBQ();
+    //console.log(BBQObj)
+    let myClient = BBQ.Client
+    console.log(myClient)
+</script>

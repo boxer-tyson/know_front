@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+    <div class="box" id="box"></div>
+    <div class="box1"></div>
+</body>
+
+</html>
+<script>
+    (function() {
+        function GetRect(element) {
+            var rect = element.getBoundingClientRect();
+            var top = !!document.documentElement.clientTop ? document.documentElement.clientTop : 0;
+            var left = !!document.documentElement.clientLeft ? document.documentElement.clientLeft : 0;
+            return {
+                top: rect.top - top,
+                bottom: rect.bottom - top,
+                left: rect.left - left,
+                right: rect.right - left
+            }
+        }
+        var $box = document.getElementById("box");
+        var divH = $box.offsetHeight; //div高度
+        var windowH = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight; //浏览器高度兼容写法
+        console.log(windowH)
+        window.onscroll = function() {
+            var obj = GetRect($box);
+            var check = obj.bottom - obj.top;
+            if (obj.top >= windowH) { //在视口之下
+                console.log("视口之下")
+            }
+            if (obj.top < windowH && obj.bottom >= windowH) { //正在出现
+                console.log("正在出现")
+            }
+            if (obj.top > 0 && obj.top < windowH && obj.bottom > 0 && obj.bottom < windowH) { //正在视口中
+                console.log("正在视口中")
+            }
+            if (obj.top <= 0 && obj.bottom <= divH && obj.bottom > 0) { //正在离开视口
+                console.log("正在离开视口")
+            }
+            if (obj.bottom <= 0) { //已经离开视口
+                console.log("已经离开视口")
+            }
+        };
+    })()
+</script>
+
+<style>
+    * {
+        padding: 0;
+        margin: 0;
+    }
+    
+    .box {
+        background: #ccc;
+        width: 500px;
+        height: 400px;
+        margin-top: 1000px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    
+    .box1 {
+        width: 100px;
+        height: 1000px;
+        margin-top: 100px;
+        background: #fff;
+    }
+</style>

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+
+</body>
+
+</html>
+
+<script>
+    let teach = {
+            "title": "javascript教学",
+            "url": "tunxun.com",
+            "teacher": {
+                "name": "youyu",
+            },
+            "how": {
+                "name": "youyu",
+                "nam": "youyu",
+            }
+        }
+        //转字符串
+    console.log(JSON.stringify(teach));
+    //保留需要的属性
+    console.log(JSON.stringify(teach, ['title', 'url']));
+    console.log(JSON.stringify(teach, null, 4));
+
+    let jsonStr = JSON.stringify(teach);
+    console.log(JSON.parse(jsonStr));
+
+    console.log(
+        JSON.parse(jsonStr, (key, value) => {
+            if (key == "title") {
+                return `[推荐] ${value}`;
+            }
+            return value;
+        })
+    )
+</script>

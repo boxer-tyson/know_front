@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>axios配合mock使用</title>
+    <script src="http://mockjs.com/dist/mock.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+</head>
+
+<body>
+
+</body>
+
+</html>
+
+<script>
+    let UrlStr = 'https://tyson.com'
+    axios.request({
+        method: 'get',
+        url: UrlStr
+    }).then(res => {
+        console.log(res.data)
+    })
+
+    //mock 拦截 url需要和请求一样
+    Mock.mock(UrlStr, {
+        'list|5-20': [{
+            'id|+1': 1,
+            'username': '@cname',
+            'email': '@email'
+        }]
+
+    })
+</script>

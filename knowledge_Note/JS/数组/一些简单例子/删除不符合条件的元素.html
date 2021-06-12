@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+
+</body>
+
+</html>
+
+<script>
+    //例1
+    arr = [2, 45, 'uis', {
+        name: 'boxer',
+        title: 'no.1',
+        obj: {
+            name: 'tson',
+            age: 19
+        }
+    }, 's', 2, 2, 78]
+    for (let i = arr.length - 1; i >= 0; i--) {
+        if (arr[i] == 2) {
+            arr.splice(i, 1);
+        }
+    }
+    console.table(arr)
+
+    //例2是例1的改良版
+    function emp2() {
+        var arr = [1, 2, 2, 3, 4, 5];
+        var i = arr.length;
+        while (i--) {
+            console.log(i + "=" + arr[i]);
+            if (arr[i] == 2) {
+                arr.splice(i, 1);
+            }
+        }
+        console.log(arr);
+    }
+    emp2()
+
+    //例3
+    var array = [{
+        id: 1,
+        name: "aaa",
+        info: [{
+            id: 1,
+            adress: "beijin"
+        }, {
+            id: 2,
+            adress: "shanghai"
+        }]
+    }, {
+        id: 2,
+        name: "bbb",
+        info: [{
+            id: 1,
+            adress: "beijin"
+        }, {
+            id: 2,
+            adress: "shanghai"
+        }]
+    }];
+    array.map((item, index) => {
+        var list = item.info.filter((voo) => {
+            return item.id == voo.id;
+        })
+        array[index].info = list
+    })
+    console.table(array)
+</script>

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+
+</body>
+
+</html>
+
+<script>
+    let p = new Promise((res1, rej1) => {
+        rej1('第1层失败')
+    }).then(value => {
+            return new Promise((res2, rej2) => {
+                rej2('第2层失败')
+            })
+        }
+
+    ).catch(error => {
+        console.log('catch' + error)
+    })
+</script>

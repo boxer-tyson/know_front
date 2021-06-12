@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+
+</body>
+
+</html>
+
+<script>
+    //浅拷贝
+    let obj = {
+        today: '1997-05-20',
+        event: 'mj get MVP'
+    }
+    let eventObj = Object.assign({}, obj)
+    let eventObj2 = {...obj
+    }
+    eventObj2.today = '1996-04-12'
+    console.log(eventObj)
+    console.log(eventObj2)
+
+    let eventObj3 = {}
+    for (const key in obj) {
+        eventObj3[key] = obj[key] + 'woc'
+    }
+    console.log(eventObj3)
+
+    //深拷贝
+    let deepObj = {
+        name: 'tyson',
+        who: {
+            title: 'boxer'
+        },
+        callname: ['tiger', 'tank', 'killer']
+    }
+
+    //数组和对象同种方式处理
+    let aboxer = ['boxer', 'tyson']
+    let bboxer = {
+            title: 'boxer',
+            name: 'tyson'
+        }
+        //输出的结果一样
+    console.log(JSON.stringify(Object.entries(aboxer), null, 2))
+    console.log(JSON.stringify(Object.entries(bboxer), null, 2))
+
+    function deepCopy(obj) {
+        //区分数组还是对象
+        let res = obj instanceof Array ? [] : {}
+        for (const [k, v] of Object.entries(obj)) {
+            res[k] = typeof v == 'object' ? deepCopy(v) : v
+        }
+        return res;
+    }
+
+    let tysonInfo = deepCopy(deepObj)
+    tysonInfo.who.title = 'No.1'
+    tysonInfo.callname = ['goodMan']
+    console.log(JSON.stringify(deepObj, null, 2))
+    console.log(JSON.stringify(tysonInfo, null, 2))
+</script>

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+
+</body>
+
+</html>
+
+<script>
+    //还在被使用就不会被删除
+    function boxer() {
+        let n = 1;
+        return function sum() {
+            let m = 1
+            return function show() {
+                console.log('m: ' + ++m);
+                console.log('n: ' + ++n);
+            }
+        }
+    }
+    let a = boxer()()
+    a()
+    a()
+    a()
+
+    //多级作用域嵌套
+    let arr1 = []
+    for (let i = 1; i < 4; i++) {
+        arr1.push(function() {
+            return i;
+        })
+    }
+    console.log(arr1[1]())
+
+    let arr2 = []
+    for (var k = 1; k < 4; k++) {
+        arr2.push(function() {
+            return k;
+        })
+    }
+    console.log(arr2[1]())
+
+    let arr3 = []
+    for (var l = 1; l < 4; l++) {
+        (function(u) {
+            arr3.push(function() {
+                return u;
+            })
+        })(l)
+    }
+    console.log(arr3[1]())
+</script>

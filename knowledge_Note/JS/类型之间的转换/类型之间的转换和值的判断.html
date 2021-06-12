@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>类型之间转换</title>
+</head>
+
+<body>
+
+</body>
+
+</html>
+
+<script>
+    //字符串 -> 数字
+    let numStr = '911.0835'
+    let num1 = parseInt(numStr)
+    let num2 = parseFloat(numStr)
+    console.log(`${num1} - ${num2}`)
+
+    //数字 -> 字符串
+    let numStr2 = num2.toString()
+    console.log(typeof numStr2)
+
+    //NaN(特殊的Number)
+    // 表示无效的数值，下例计算将产生NaN结果。
+    let nanRes = 2 / 'tyson'
+    console.log(nanRes); //NaN
+    if (Number.isNaN(nanRes)) {
+        console.log('Error');
+    }
+
+    //浮点数精度
+    Number.prototype.add = function(num) {
+        //取两个数值中小数位最大的
+        let n1 = this.toString().split('.')[1].length
+        let n2 = num.toString().split('.')[1].length
+            //得到10的N次幂
+        let m = Math.pow(10, Math.max(n1, n2))
+        return (this * m + num * m) / m
+    }
+    console.log(num2.add(0.2))
+</script>

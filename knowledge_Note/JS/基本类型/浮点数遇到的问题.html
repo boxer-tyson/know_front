@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+
+</body>
+
+</html>
+
+<script>
+    /*
+                                    这是因为计算机以二进制处理数值类型，上面的0.1与0.2转为二进制后是无穷的
+                                    //0.0001100110011001100110011001100110011001100110011001101
+                                    console.log((0.1).toString(2)) 
+                                    //0.001100110011001100110011001100110011001100110011001101
+                                    console.log((0.2).toString(2)) 
+                                        */
+    let sum = 0.1 + 0.2
+    console.log(sum)
+
+    //处理方式1.使用toFixed 方法进行小数截取
+    console.log((0.1 + 0.2).toFixed(2)) //0.3
+    console.log(1.0 - 0.9) //0.09999999999999998
+    console.log((1.0 - 0.9).toFixed(2)) //0.10
+        //2.将小数转为整数进行计算后，再转为小数也可以解决精度问题
+    Number.prototype.add = function(num) {
+        //取两个数值中小数位最大的
+        let n1 = this.toString().split('.')[1].length
+        let n2 = num.toString().split('.')[1].length
+
+        //得到10的N次幂
+        let m = Math.pow(10, Math.max(n1, n2))
+
+        return (this * m + num * m) / m
+    }
+    console.log((0.1).add(0.2768))
+
+    console.log(Math.max.apply(Math, [1, 2, 3]));
+
+    console.log(Math.round(2.49999999999999));
+    /*
+    推荐做法
+市面上已经存在很多针对数学计算的库 
+mathjs (opens new window)、decimal.js (opens new window)等，
+我们就不需要自己构建了。下面来演示使用 decimal.js (opens new window)进行浮点计算。
+
+
+    */
+</script>

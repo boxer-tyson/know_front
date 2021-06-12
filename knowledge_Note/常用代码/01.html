@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+
+</body>
+
+</html>
+
+<script>
+    function maiyaBuildParam(arr) {
+        var result = '';
+        for (var key in arr) {
+            //encodeURIComponent() 函数可把字符串作为 URI 组件进行编码
+            result += key + "=" + encodeURIComponent(arr[key]) + "&";
+        }
+        result = result.substr(0, result.length - 1);
+        return result;
+    }
+
+    let arr = ['boxer', 'text', 'mike', 23, 'lo']
+    let res = maiyaBuildParam(arr)
+    console.log(res)
+</script>

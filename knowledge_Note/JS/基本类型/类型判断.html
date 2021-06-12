@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+
+</body>
+
+</html>
+
+<script>
+    //一般情况下 typeof 用于检测 基础的值类型
+    let a = 1;
+    console.log(typeof a); //number
+
+    let b = "1";
+    console.log(typeof b); //string
+
+    //未赋值或不存在的变量返回undefined
+    var hd;
+    console.log(typeof hd);
+
+    function run() {}
+    console.log(typeof run); //function
+
+    let c = [1, 2, 3];
+    console.log(typeof c); //object
+
+    let d = {
+        name: "tyson"
+    };
+    console.log(typeof d); //object
+
+    // instanceof (常用于引用类型)
+    // instanceof 运算符用于检测构造函数的 prototype 属性是否出现在某个实例对象的原型链上。
+    // 也可以理解为是否为某个对象的实例，typeof不能区分数组，但instanceof则可以。
+
+    let hd = [];
+    let boxer = {};
+    console.log(hd instanceof Array); //true
+    console.log(boxer instanceof Array); //false
+
+    let c = [1, 2, 3];
+    console.log(c instanceof Array); //true
+
+    let d = {
+        name: "boxer.com"
+    };
+    console.log(d instanceof Object); //true
+
+    function User() {}
+    let hd = new User();
+    console.log(hd instanceof User); //true
+</script>

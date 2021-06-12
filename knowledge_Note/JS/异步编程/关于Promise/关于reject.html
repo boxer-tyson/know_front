@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+
+</body>
+
+</html>
+
+<script>
+    let p = new Promise((resolve, reject) => {
+        resolve('第一层成功')
+            //reject('第一层失败')
+    }).then(value => {
+        // console.log('看一下')
+        return Promise.reject('第二层出错了')
+    }).catch(error => {
+        console.log(error)
+    })
+</script>

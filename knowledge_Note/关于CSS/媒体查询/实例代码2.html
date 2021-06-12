@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>后盾人</title>
+
+</head>
+
+<body>
+    <div class="hd">houdunren.com</div>
+</body>
+
+</html>
+
+<style>
+    @media screen and (min-width: 300px) {
+        body {
+            background: #8e44ad;
+        }
+        *,
+        body {
+            padding: 0;
+            margin: 0;
+        }
+        .hd {
+            line-height: 3rem;
+            height: 3rem;
+            margin: 0;
+            padding: 0;
+            font-size: 1em;
+            color: rgb(212, 35, 35);
+        }
+    }
+</style>
+
+<script>
+    !(function(doc, win) {
+        //获取html元素
+        var docEle = doc.documentElement;
+        ////判断是屏幕旋转还是resize;
+        event = "onorientationchange" in window ? "orientationchange" : "resize";
+        fn = function() {
+            //屏幕宽度
+            var width = docEle.clientWidth;
+            width && (docEle.style.fontSize = 100 * (width / 320) + 'px')
+            console.log(docEle.style.fontSize)
+        };
+        win.addEventListener(event, fn, false);
+        doc.addEventListener("DOMContentLoaded", fn, false);
+    })(document, window)
+</script>

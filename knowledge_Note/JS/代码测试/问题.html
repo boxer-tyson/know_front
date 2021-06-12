@@ -1,0 +1,1354 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+
+</body>
+
+</html>
+
+<script>
+    /*
+     * 版 本 SEFA-ADMS V1.0.0 透明工厂开发框架
+     * Copyright (c) 2018 施耐德智能技术有限工艺配置
+    /// 创建人：yinzq
+    /// 日 期：2019.11.06
+     * 描 述：需求数据
+     */
+    var refreshGirdData; // 更新数据
+    var selectedRow;
+    var project = '';
+    var Region = '';
+    var Shipto = '';
+    var State = '';
+    var Geo = "";
+    var Shipped = "";
+    var OrderType = '';
+    var freezeThaw = ""; //冻结状态
+    var bootstrap = function($, sefa) {
+        "use strict";
+        //SMD  L10
+        var departmentId = '6e9f0b7c-411a-40d2-86c5-e5a915c77a74';
+        var page = {
+            init: function() {
+                page.initGrid();
+                page.initNotify();
+                page.bind();
+            },
+            bind: function() {
+                $('#Project').lrselect({
+                    placeholder: "Project",
+                });
+                $('#Project').on('change', function(a) {
+                    project = $('#Project').lrselectGet();
+                });
+                $('#State').lrselect({
+                    placeholder: "State",
+                });
+                $('#State').on('change', function(a) {
+                    State = $('#State').lrselectGet();
+                });
+
+                $('#Region').lrselect({
+                    // 字段
+                    value: "F_ItemValue",
+                    text: "F_ItemName",
+                    title: "F_ItemName",
+                    type: 'multiple',
+                    // 是否允许搜索
+                    allowSearch: false,
+                    placeholder: "Region",
+                    // 访问数据接口地址
+                    url: top.$.rootUrl + '/Base_SystemModule/DataItem/GetDetailList',
+                    param: {
+                        itemCode: "RegionTen"
+                    }
+                });
+                $('#Region').on('change', function(a) {
+                    Region = $('#Region').lrselectGet();
+                });
+                $('#OrderType').lrselect({
+                    placeholder: "OrderStatus",
+                });
+                $('#OrderType').on('change', function(a) {
+                    OrderType = $('#OrderType').lrselectGet();
+                });
+                $('#Shipto').lrselect({
+                    // 字段
+                    value: "F_ItemValue",
+                    text: "F_ItemName",
+                    title: "F_ItemName",
+                    type: 'multiple',
+                    // 是否允许搜索
+                    allowSearch: false,
+                    placeholder: "Shipto",
+                    // 访问数据接口地址
+                    url: top.$.rootUrl + '/Base_SystemModule/DataItem/GetDetailList',
+                    param: {
+                        itemCode: "ShiptoTen"
+                    }
+                });
+                $('#Shipto').on('change', function(a) {
+                    Shipto = $('#Shipto').lrselectGet();
+                });
+
+                // 查询
+                $('#btn_Search').on('click', function() {
+                    if (!project) {
+                        sefa.alert.warning('請選擇Project！');
+                        return false;
+                    }
+                    page.search();
+                });
+
+
+                // 刷新
+                $('#lr_refresh').on('click', function() {
+                    location.reload();
+                });
+
+                // 接单
+                $('#lr_add').on('click', function() {
+                    if (!departmentId) {
+                        sefa.alert.warning('请选择部门！');
+                        return false;
+                    }
+                    if (!project) {
+                        sefa.alert.warning('請選擇Project！');
+                        return false;
+                    }
+                    sefa.layerForm({
+                        id: 'RequestForm',
+                        title: '同步需求数据',
+                        url: top.$.rootUrl + '/PPM/NeedDataSMD/RequestForm?departmentId=' + departmentId + '&Project=' + project,
+                        width: 600,
+                        height: 400,
+                        callBack: function(id) {
+                                return top[id].acceptClick();
+                            } //,
+                            //end: function () {
+                            // $('#lr_add').attr('disabled', 'disabled');
+                            // refreshGirdData();
+                            //}
+                    });
+                });
+
+                // 请求
+                $('#lr_sync').on('click', function() {
+                    if (!departmentId) {
+                        sefa.alert.warning('请选择部门！');
+                        return false;
+                    }
+                    if (!project) {
+                        sefa.alert.warning('請選擇Project！');
+                        return false;
+                    }
+                    sefa.layerConfirm('是否确认请求！', function(res) {
+                        if (res) {
+                            sefa.postForm(top.$.rootUrl + '/PPM/NeedDataSMD/RequestNeedDataAsync', {
+                                departmentId: departmentId,
+                                Project: project
+                            }, function() {
+                                $('#lr_sync').attr('disabled', 'disabled');
+                                refreshGirdData();
+                            });
+                        }
+                    });
+                });
+
+                // 手动接单
+                $('#lr_Handadd').on('click', function() {
+                    if (!departmentId) {
+                        sefa.alert.warning('请选择部门！');
+                        return false;
+                    }
+                    if (!project) {
+                        sefa.alert.warning('請選擇Project！');
+                        return false;
+                    }
+                    sefa.layerForm({
+                        id: 'RequestForm',
+                        title: '手动同步需求数据',
+                        url: top.$.rootUrl + '/PPM/NeedDataSMD/HandRequestForm?departmentId=' + departmentId + '&Project=' + project,
+                        width: 400,
+                        height: 200,
+                        callBack: function(id) {
+                                return top[id].acceptClick();
+                            } //,
+                            //end: function () {
+                            // $('#lr_add').attr('disabled', 'disabled');
+                            // refreshGirdData();
+                            //}
+                    });
+                });
+
+                //冻结
+                $('#lr_freeze').on('click', function() {
+                    if (!departmentId) {
+                        sefa.alert.warning('请选择部门！');
+                        return false;
+                    }
+                    var _btns = $('#gridtable').jfGridGet('rowdata');
+                    var btns = [];
+                    //每条数据的id存放于数组
+                    $.each(_btns, function(_index, _item) {
+                        if (_item.ID) {
+                            btns.push(_item.ID);
+                        }
+                    });
+                    freezeThaw = 50;
+                    //console.log(postData);
+                    sefa.layerConfirm('是否确认冻结！', function(res) {
+                        if (res) {
+                            sefa.postForm(top.$.rootUrl + '/PPM/NeedDataSMD/UpdateState', {
+                                state: freezeThaw,
+                                keyValue: btns.toString()
+                            }, function() {
+                                refreshGirdData();
+                            });
+                        }
+                    });
+
+                })
+
+                //解冻
+                $('#lr_thaw').on('click', function() {
+                    if (!departmentId) {
+                        sefa.alert.warning('请选择部门！');
+                        return false;
+                    }
+                    var _btns = $('#gridtable').jfGridGet('rowdata');
+                    var btns = [];
+                    //每条数据的id存放于数组
+                    $.each(_btns, function(_index, _item) {
+                        if (_item.ID) {
+                            btns.push(_item.ID);
+                        }
+                    });
+                    freezeThaw = 60;
+                    //console.log(postData);
+                    sefa.layerConfirm('是否确认解冻！', function(res) {
+                        if (res) {
+                            sefa.postForm(top.$.rootUrl + '/PPM/NeedDataSMD/UpdateState', {
+                                state: freezeThaw,
+                                keyValue: btns.toString()
+                            }, function() {
+                                refreshGirdData();
+                            });
+                        }
+                    });
+                })
+
+                //导入
+                $('#lr_import').on('click', function() {
+                    if (!departmentId) {
+                        sefa.alert.warning('請選擇部门！');
+                        return false;
+                    }
+                    sefa.layerForm({
+                        id: 'UpLoadForm',
+                        title: '需求数据L10',
+                        url: top.$.rootUrl + '/PPM/NeedDataSMD/UpLoadForm?keyVaule=NeedDataSMD&extensions=xls,xlsx&departmentId=' + departmentId,
+                        width: 600,
+                        height: 400
+                    });
+                });
+                //导入休息日
+                $('#lr_InputRestDate').on('click', function() {
+                    if (!departmentId) {
+                        sefa.alert.warning('請選擇部门！');
+                        return false;
+                    }
+                    sefa.layerForm({
+                        id: 'UpLoadFormRestDate',
+                        title: '需求数据L10',
+                        url: top.$.rootUrl + '/PPM/NeedDataSMD/UpLoadFormRestDate?keyVaule=NeedDataSMD&extensions=xls,xlsx&departmentId=' + departmentId,
+                        width: 600,
+                        height: 400
+                    });
+                });
+
+                // 导出
+                $('#lr_output').on('click', function() {
+                    if (!departmentId) {
+                        sefa.alert.warning('請選擇部门！');
+                        return false;
+                    }
+                    if (!project) {
+                        sefa.alert.warning('請選擇Project！');
+                        return false;
+                    }
+                    sefa.layerConfirm('是否确认导出！', function(res, index) {
+                        if (res) {
+                            var postData = {};
+                            postData.DepartMent_Id = departmentId;
+                            postData.Project = project;
+                            postData.Platform = $("#txt_Platform").val();
+                            postData.SKU = $("#txt_SKU").val();
+                            postData.WO = $("#txt_WO").val();
+                            postData.Order_Type = $("#txt_Order_Type").val();
+                            postData.StaterDate = $("#Need_StaterDate").val();
+                            postData.EndDate = $("#Need_EndDate").val();
+                            postData.EXStaterDate = $("#Need_EXStaterDate").val();
+                            postData.EXEndDate = $("#Need_EXEndDate").val();
+                            postData.State = State;
+                            postData.Order_Status = OrderType;
+                            postData.Region = Region;
+                            postData.Ship_to = Shipto;
+                            postData.ProjectType = $("#ProjectType").val();
+                            //postData.Order_Type = OrderType;
+                            sefa.postForm(top.$.rootUrl + '/PPM/NeedDataSMD/GetListExport', {
+                                queryJson: JSON.stringify(postData)
+                            }, function(result) {
+
+                                var exc = result.data.Data.NeedDataSMDModelList;
+                                var excData = result.data.Data.Data;
+                                console.log("excData", excData);
+                                var reg = RegExp(/\r\n/);
+                                var exp = RegExp(/\n/);
+                                let str;
+                                if (project == 'HP') {
+                                    //生成表头
+                                    str = '<tr><td align="middle">Project</td>' +
+                                        '<td align="middle">Order_Receipt_Date</td>' +
+                                        '<td align="middle">Ship_to</td>' +
+                                        '<td align="middle">SD</td>' +
+                                        '<td align="middle">Region</td>' +
+                                        '<td align="middle">Order_Type</td>' +
+                                        '<td align="middle">Route_Code</td>' +
+                                        '<td align="middle">PO_NO</td>' +
+                                        '<td align="middle">Priority</td>' +
+                                        '<td align="middle">Shipping_Mode</td>' +
+                                        '<td align="middle">Platform</td>' +
+                                        '<td align="middle">Model</td>' +
+                                        '<td align="middle">SKU</td>' +
+                                        '<td align="middle">QTY</td>' +
+                                        '<td align="middle">WO</td>' +
+                                        '<td align="middle">Pallet_Type</td>' +
+                                        '<td align="middle">Ex_FactoryDeadline</td>' +
+                                        '<td align="middle">New855DATE</td>' +
+                                        '<td align="middle">Reason</td>' +
+                                        '<td align="middle">One_History_Reason</td>' +
+                                        '<td align="middle">History_Reason</td>' +
+                                        '<td align="middle">Remark</td>' +
+                                        '<td align="middle">Plan_Date</td>' +
+                                        '<td align="middle">Input_Date</td>' +
+                                        '<td align="middle">Inputdate_Shift</td>' +
+                                        '<td align="middle">HFSO</td>' +
+                                        '<td align="middle">RSD</td>' +
+                                        '<td align="middle">SOErrorMsg</td>' +
+                                        '<td align="middle">LastEditDT</td>' +
+                                        '<td align="middle">System</td>' +
+                                        '<td align="middle">Order_Status</td>' +
+                                        '<td align="middle">ProjectType</td>' +
+                                        '<td align="middle">生产周期</td>' +
+                                        '<td align="middle">余量</td></tr>';
+
+                                    //循环遍历，每行加入tr标签，每个单元格加td标签
+                                    for (let i = 0; i < exc.length; i++) {
+                                        const res = exc
+                                        str += '<tr><td align="middle">' + (exc[i].Project ? exc[i].Project : '') + '</td>' +
+                                            '<td align="middle">' + (exc[i].Order_Receipt_Date ? sefa.formatDate(exc[i].Order_Receipt_Date, 'yyyy/MM/dd') : '') + '</td>' +
+                                            '<td align="middle">' + (exc[i].Ship_to ? exc[i].Ship_to : '') + '</td>' +
+                                            '<td align="middle">' + (exc[i].SD ? exc[i].SD : '') + '</td>' +
+                                            '<td align="middle">' + (exc[i].Region ? exc[i].Region : '') + '</td>' +
+                                            '<td align="middle">' + (exc[i].Order_Type ? exc[i].Order_Type : '') + '</td>' +
+                                            '<td align="middle">' + (exc[i].Route_Code ? exc[i].Route_Code : '') + '</td>' +
+                                            '<td align="middle" style="mso-number-format:\'\@\';">' + (exc[i].PO_NO ? exc[i].PO_NO : '') + '</td>' +
+                                            '<td align="middle">' + (exc[i].Priority ? exc[i].Priority : '') + '</td>' +
+                                            '<td align="middle">' + (exc[i].Shipping_Mode ? exc[i].Shipping_Mode : '') + '</td>' +
+                                            '<td align="middle">' + (exc[i].Platform ? exc[i].Platform : '') + '</td>' +
+                                            '<td align="middle">' + (exc[i].Model ? exc[i].Model : '') + '</td>' +
+                                            '<td align="middle">' + (exc[i].SKU ? exc[i].SKU : '') + '</td>' +
+                                            '<td align="middle">' + (exc[i].QTY ? exc[i].QTY : '') + '</td>' +
+                                            '<td align="middle">' + (exc[i].WO ? exc[i].WO : '') + '</td>' +
+                                            '<td align="middle">' + (exc[i].Pallet_Type ? exc[i].Pallet_Type : '') + '</td>' +
+                                            '<td align="middle">' + (exc[i].Ex_FactoryDeadline ? exc[i].Ex_FactoryDeadline : '') + '</td>' +
+                                            '<td align="middle">' + (exc[i].New855DATE ? sefa.formatDate(exc[i].New855DATE, 'yyyy/MM/dd') : '') + '</td>' +
+                                            
+                                            '<td align="left">=' + (exc[i].Reason ? exc[i].Reason.match(reg) ? exc[i].Reason.replace(/\r\n/g, '&CHAR(10)&') : exc[i].Reason.match(exp) ? exc[i].Reason.replace(/\r\n/g, '&CHAR(10)') : exc[i].Reason : '') + '</td>' +
+                                            '<td align="left">' + (exc[i].One_History_Reason ? exc[i].One_History_Reason.match(reg) ? exc[i].One_History_Reason.replace(/\r\n/g) : exc[i].One_History_Reason.match(exp) ? exc[i].One_History_Reason.replace(/\r\n/g) : exc[i].One_History_Reason : '') + '</td>' +
+                                            '<td align="left">' + (exc[i].History_Reason ? exc[i].History_Reason.match(reg) ? exc[i].History_Reason.replace(/\r\n/g) : exc[i].History_Reason.match(exp) ? exc[i].History_Reason.replace(/\r\n/g) : exc[i].History_Reason : '') + '</td>' +
+                                            '<td align="middle">' + (exc[i].Remark ? exc[i].Remark : '') + '</td>' +
+                                            '<td align="middle">' + (exc[i].Plan_Date ? sefa.formatDate(exc[i].Plan_Date, 'yyyy/MM/dd') : '') + '</td>' +
+                                            '<td align="middle">' + (exc[i].Input_Date ? sefa.formatDate(exc[i].Input_Date, 'yyyy/MM/dd') : '') + '</td>' +
+                                            '<td align="middle">' + (exc[i].Inputdate_Shift ? exc[i].Inputdate_Shift == '1' ? '白班' : exc[i].Inputdate_Shift == '2' ? '晚班' : exc[i].Inputdate_Shift : '') + '</td>' +
+                                            '<td align="middle" style="mso-number-format:\'\@\';">' + (exc[i].HFSO ? exc[i].HFSO : '') + '</td>' +
+                                            '<td align="middle">' + (exc[i].RSD ? exc[i].RSD : '') + '</td>' +
+                                            '<td align="middle">' + (exc[i].SOErrorMsg ? exc[i].SOErrorMsg : '') + '</td>' +
+                                            '<td align="middle">' + (exc[i].LastEditDT ? exc[i].LastEditDT : '') + '</td>' +
+                                            '<td align="middle">' + (exc[i].System ? sefa.formatDate(exc[i].System, 'yyyy/MM/dd hh:mm:ss') : '') + '</td>' +
+                                            '<td align="middle">' + (exc[i].Order_Status ? exc[i].Order_Status : '') + '</td>' +
+                                            '<td align="middle">' + (exc[i].ProjectType ? exc[i].ProjectType : '') + '</td>' +
+                                            '<td align="middle">=IF(OR(W' + (i + 2) + '="",O' + (i + 2) + '=""),"",IF((NETWORKDAYS.INTL(W' + (i + 2) + ',Q' + (i + 2) + ',1)-1)<=2,"A","B"))</td>' +
+                                            '<td align="middle">' + (exc[i].SurplusQTY ? exc[i].SurplusQTY : '') + '</td></tr>';
+
+                                    }
+                                } else if (project == 'Lenovo') {
+                                    //生成表头
+                                    str = '<tr><td align="middle">Project</td>' +
+                                        '<td align="middle">B2B_Order_Date</td>' +
+                                        '<td align="middle">Order_Receipt_Date</td>' +
+                                        '<td align="middle">Ship_to</td>' +
+                                        '<td align="middle">SD</td>' +
+                                        '<td align="middle">GEO</td>' +
+                                        '<td align="middle">SUBGEO</td>' +
+                                        '<td align="middle">Region</td>' +
+                                        '<td align="middle">Order_Type</td>' +
+                                        '<td align="middle">Route_Code</td>' +
+                                        '<td align="middle">PO_NO</td>' +
+                                        '<td align="middle">Priority</td>' +
+                                        '<td align="middle">Shipping_Mode</td>' +
+                                        '<td align="middle">Platform</td>' +
+                                        '<td align="middle">Model</td>' +
+                                        '<td align="middle">SKU</td>' +
+                                        '<td align="middle">QTY</td>' +
+                                        '<td align="middle">WO</td>' +
+                                        '<td align="middle">Pallet_Type</td>' +
+                                        '<td align="middle">Ex_FactoryDeadline</td>' +
+                                        '<td align="middle">New855DATE</td>' +
+                                        '<td align="middle">Reason</td>' +
+                                        '<td align="middle">One_History_Reason</td>' +
+                                        '<td align="middle">History_Reason</td>' +
+                                        '<td align="middle">Remark</td>' +
+                                        '<td align="middle">Plan_Date</td>' +
+                                        '<td align="middle">Input_Date</td>' +
+                                        '<td align="middle">Inputdate_Shift</td>' +
+                                        '<td align="middle">HFSO</td>' +
+                                        '<td align="middle">RSD</td>' +
+                                        '<td align="middle">SpecialBid</td>' +
+                                        '<td align="middle">WE19</td>' +
+                                        '<td align="middle">Carrier</td>' +
+                                        '<td align="middle">BBY</td>' +
+                                        '<td align="middle">Dixon</td>' +
+                                        '<td align="middle">item_tie</td>' +
+                                        '<td align="middle">Deliver_Group_NO</td>' +
+                                        '<td align="middle">polineno</td>' +
+                                        '<td align="middle">potype</td>' +
+                                        '<td align="middle">custsalesorg</td>' +
+                                        '<td align="middle">ShortagePN</td>' +
+                                        '<td align="middle">ShortagePNdescription</td>' +
+                                        '<td align="middle">RecoverySchedule</td>' +
+                                        '<td align="middle">NewMTM</td>' +
+                                        '<td align="middle">NEW_GEO</td>' +
+                                        '<td align="middle">Order_Status</td>' +
+                                        '<td align="middle">ProjectType</td>' +
+                                        '<td align="middle">生产周期</td>' +
+                                        '<td align="middle">余量</td></tr>';
+
+
+                                    //循环遍历，每行加入tr标签，每个单元格加td标签
+                                    for (let i = 0; i < exc.length; i++) {
+                                        str += '<tr><td align="middle">' + (exc[i].Project ? exc[i].Project : '') + '</td>' +
+                                            '<td align="middle">' + (exc[i].B2B_Order_Date ? exc[i].B2B_Order_Date : '') + '</td>' +
+                                            '<td align="middle">' + (exc[i].Order_Receipt_Date ? sefa.formatDate(exc[i].Order_Receipt_Date, 'yyyy/MM/dd') : '') + '</td>' +
+                                            '<td align="middle">' + (exc[i].Ship_to ? exc[i].Ship_to : '') + '</td>' +
+                                            '<td align="middle">' + (exc[i].SD ? exc[i].SD : '') + '</td>' +
+                                            '<td align="middle">' + (exc[i].GEO ? exc[i].GEO : '') + '</td>' +
+                                            '<td align="middle">' + (exc[i].SUBGEO ? exc[i].SUBGEO : '') + '</td>' +
+                                            '<td align="middle">' + (exc[i].Region ? exc[i].Region : '') + '</td>' +
+                                            '<td align="middle">' + (exc[i].Order_Type ? exc[i].Order_Type : '') + '</td>' +
+                                            '<td align="middle">' + (exc[i].Route_Code ? exc[i].Route_Code : '') + '</td>' +
+                                            '<td align="middle"  style="mso-number-format:\'\@\';">' + (exc[i].PO_NO ? exc[i].PO_NO : '') + '</td>' +
+                                            '<td align="middle">' + (exc[i].Priority ? exc[i].Priority : '') + '</td>' +
+                                            '<td align="middle">' + (exc[i].Shipping_Mode ? exc[i].Shipping_Mode : '') + '</td>' +
+                                            '<td align="middle">' + (exc[i].Platform ? exc[i].Platform : '') + '</td>' +
+                                            '<td align="middle">' + (exc[i].Model ? exc[i].Model : '') + '</td>' +
+                                            '<td align="middle">' + (exc[i].SKU ? exc[i].SKU : '') + '</td>' +
+                                            '<td align="middle">' + (exc[i].QTY ? exc[i].QTY : '') + '</td>' +
+                                            '<td align="middle">' + (exc[i].WO ? exc[i].WO : '') + '</td>' +
+                                            '<td align="middle">' + (exc[i].Pallet_Type ? exc[i].Pallet_Type : '') + '</td>' +
+                                            '<td align="middle">' + (exc[i].Ex_FactoryDeadline ? exc[i].Ex_FactoryDeadline : '') + '</td>' +
+                                            '<td align="middle">' + (exc[i].New855DATE ? sefa.formatDate(exc[i].New855DATE, 'yyyy/MM/dd') : '') + '</td>' +
+                                            '<td align="left">=' + (exc[i].Reason ? exc[i].Reason.match(reg) ? exc[i].Reason.replace(/\r\n/g, '&CHAR(10)&') : exc[i].Reason.match(exp) ? exc[i].Reason.replace(/\r\n/g, '&CHAR(10)&') : exc[i].Reason : '') + '</td>' +
+                                            '<td align="left">' + (exc[i].One_History_Reason ? exc[i].One_History_Reason.match(reg) ? exc[i].One_History_Reason.replace(/\r\n/g, 'CHAR(10)') : exc[i].One_History_Reason.match(exp) ? exc[i].One_History_Reason.replace(/\r\n/g) : exc[i].One_History_Reason : '') + '</td>' +
+                                            '<td align="left">' + (exc[i].History_Reason ? exc[i].History_Reason.match(reg) ? exc[i].History_Reason.replace(/\r\n/g) : exc[i].History_Reason.match(exp) ? exc[i].History_Reason.replace(/\r\n/g) : exc[i].History_Reason : '') + '</td>' +
+                                            //'<td align="left">' + (exc[i].History_Reason ? exc[i].History_Reason.match(reg) ? exc[i].History_Reason.replace(/\r\n/g, '</br>') : exc[i].History_Reason.match(exp) ? exc[i].History_Reason.replace(/\n/g, '</br>') : exc[i].History_Reason : '') + '</td>' +
+                                            '<td align="middle">' + (exc[i].Remark ? exc[i].Remark : '') + '</td>' +
+                                            '<td align="middle">' + (exc[i].Plan_Date ? sefa.formatDate(exc[i].Plan_Date, 'yyyy/MM/dd') : '') + '</td>' +
+                                            '<td align="middle">' + (exc[i].Input_Date ? sefa.formatDate(exc[i].Input_Date, 'yyyy/MM/dd') : '') + '</td>' +
+                                            '<td align="middle">' + (exc[i].Inputdate_Shift ? exc[i].Inputdate_Shift == '1' ? '白班' : exc[i].Inputdate_Shift == '2' ? '晚班' : exc[i].Inputdate_Shift : '') + '</td>' +
+                                            '<td align="middle"  style="mso-number-format:\'\@\';">' + (exc[i].HFSO ? exc[i].HFSO : '') + '</td>' +
+                                            '<td align="middle">' + (exc[i].RSD ? exc[i].RSD : '') + '</td>' +
+                                            '<td align="middle">' + (exc[i].SpecialBid ? exc[i].SpecialBid : '') + '</td>' +
+                                            '<td align="middle">' + (exc[i].WE19 ? exc[i].WE19 : '') + '</td>' +
+                                            '<td align="middle">' + (exc[i].Carrier ? exc[i].Carrier : '') + '</td>' +
+                                            '<td align="middle">' + (exc[i].BBY ? exc[i].BBY : '') + '</td>' +
+                                            '<td align="middle">' + (exc[i].Dixon ? exc[i].Dixon : '') + '</td>' +
+                                            '<td align="middle">' + (exc[i].item_tie ? exc[i].item_tie : '') + '</td>' +
+                                            '<td align="middle">' + (exc[i].Deliver_Group_NO ? exc[i].Deliver_Group_NO : '') + '</td>' +
+                                            '<td align="middle">' + (exc[i].polineno ? exc[i].polineno : '') + '</td>' +
+                                            '<td align="middle">' + (exc[i].potype ? exc[i].potype : '') + '</td>' +
+                                            '<td align="middle">' + (exc[i].custsalesorg ? exc[i].custsalesorg : '') + '</td>' +
+                                            '<td align="middle">' + (exc[i].ShortagePN ? exc[i].ShortagePN : '') + '</td>' +
+                                            '<td align="middle">' + (exc[i].ShortagePNdescription ? exc[i].ShortagePNdescription : '') + '</td>' +
+                                            '<td align="middle">' + (exc[i].RecoverySchedule ? exc[i].RecoverySchedule : '') + '</td>' +
+                                            '<td align="middle">' + (exc[i].NewMTM ? exc[i].NewMTM : '') + '</td>' +
+                                            '<td align="middle">' + (exc[i].NEW_GEO ? exc[i].NEW_GEO : '') + '</td>' +
+                                            '<td align="middle">' + (exc[i].Order_Status ? exc[i].Order_Status : '') + '</td>' +
+                                            '<td align="middle">' + (exc[i].ProjectType ? exc[i].ProjectType : '') + '</td>' +
+                                            '<td align="middle">=IF(OR(Z' + (i + 2) + '="",R' + (i + 2) + '=""),"",IF((NETWORKDAYS.INTL(Z' + (i + 2) + ',T' + (i + 2) + ',1)-1)<=2,"A","B"))</td>' +
+                                            '<td align="middle">' + (exc[i].SurplusQTY ? exc[i].SurplusQTY : '') + '</td></tr > ';
+
+                                    }
+                                }
+
+                                //汇总数据
+                                //生成表头
+                                let strDate = '<tr><td align="middle">Plandate</td>';
+                                for (var i = 0; i < excData.length; i++) {
+                                    strDate += '<td align="middle" colspan="2">' + (excData[i].Name ? excData[i].Name : '') + '</td>';
+                                }
+                                strDate += '<td align="middle" colspan="2">TOTAL</td></tr>';
+                                strDate += '<tr><td align="middle"></td>';
+                                for (var i = 0; i < excData.length; i++) {
+                                    strDate += '<td align="middle">A</td>' +
+                                        '<td align="middle">B</td>';
+                                }
+                                strDate += '<td align="middle">A</td>' +
+                                    '<td align="middle">B</td></tr>';
+
+                                var DateTime = new Date(); //默认取當前天后一個月
+                                var dayTime = sefa.formatDate(DateTime, 'yyyy-MM-dd');
+                                for (var i = 0; i < 31; i++) {
+                                    let RowIndex = 1;
+                                    let comAstring = '';
+                                    let comBstring = '';
+                                    strDate += '<tr><td align="middle">' + sefa.formatDate(sefa.parseDate(dayTime).DateAdd('d', i), 'yyyy-MM-dd'); + '</td>';
+                                    for (var j = 0; j < excData.length; j++) {
+                                        strDate += '<td align="middle">=SUMIFS(需求数据!$N:$N,需求数据!$W:$W,匯總!$A' + Number(i + 3) + ',需求数据!$D:$D,匯總!' + getExcelColumnName(RowIndex) + '$1,需求数据!$AG:$AG,匯總!' + getExcelColumnName(RowIndex) + '$2)</td>' +
+                                            '<td align="middle">=SUMIFS(需求数据!$N:$N,需求数据!$W:$W,匯總!$A' + Number(i + 3) + ',需求数据!$D:$D,匯總!' + getExcelColumnName(RowIndex) + '$1,需求数据!$AG:$AG,匯總!' + getExcelColumnName(Number(RowIndex + 1)) + '$2)</td>';
+                                        comAstring += comAstring == '' ? getExcelColumnName(RowIndex) + Number(i + 3) : '+' + getExcelColumnName(RowIndex) + Number(i + 3);
+                                        comBstring += comBstring == '' ? getExcelColumnName(Number(RowIndex + 1)) + Number(i + 3) : '+' + getExcelColumnName(Number(RowIndex + 1)) + Number(i + 3);
+                                        RowIndex = Number(RowIndex + 2);
+                                    }
+                                    strDate += '<td align="middle">=' + comAstring + '</td>' +
+                                        '<td align="middle">=' + comBstring + '</td></tr>';
+                                }
+
+                                var aa = `<table cellspacing="0" border="1" style="border-collapse:collapse;">${str}</table>`;
+                                var bb = `<table cellspacing="0" border="1" style="border-collapse:collapse;">${strDate}</table>`;
+                                var array = new Array();
+                                array.push(aa);
+                                array.push(bb);
+                                var sheetName = new Array();
+                                sheetName.push('需求数据');
+                                sheetName.push('匯總');
+                                page.tablesToExcel(array, sheetName, '需求数据.xls')
+                                    //Worksheet名
+                                    //let worksheet = 'Sheet1'
+                                    //let uri = 'data:application/vnd.ms-excel;base64,';
+
+                                //下载的表格模板数据
+                                //let template = `<html xmlns:o="urn:schemas-microsoft-com:office:office" 
+                                ///xmlns:x="urn:schemas-microsoft-com:office:excel" 
+                                //<head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet>
+                                //<x:Name>${worksheet}</x:Name>
+                                //<x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet>
+                                //</x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]-->
+                                //<style> br {mso-data-placement:same-cell;}</style>
+                                //</head><meta charset='UTF-8'><body><table>${str}</table></body></html>`;
+                                ////通过创建a标签实现
+                                //let link = document.createElement("a");
+                                //var binaryData = [];
+                                //binaryData.push(template);
+                                //var blobUrl = window.URL.createObjectURL(new Blob(binaryData, { type: uri }));
+                                //link.href = blobUrl;
+                                ////link.href = uri + btoa(unescape(encodeURIComponent(template)));
+                                ////对下载的文件命名
+                                //link.download = "需求数据.xls";
+                                //document.body.appendChild(link);
+                                //link.click();
+                                //document.body.removeChild(link);
+                            });
+                        };
+                    });
+                });
+
+                // 同步
+                $('#lr_SFCadd').on('click', function() {
+                    if (!departmentId) {
+                        sefa.alert.warning('請選擇公司！');
+                        return false;
+                    }
+                    var postData = '';
+                    var btns = [];
+                    var btns = {
+                            "StockParam": [{
+                                'Plant': 'WLAC',
+                                'DateFrom': 'DateTime.Now.AddDays(-100).Date',
+                                'DateTo': 'DateTime.Now.Date'
+                            }]
+                        }
+                        //btns.push(point);
+                    postData = JSON.stringify(btns);
+                    console.log("postData", postData);
+                    $('#lr_SFCadd').addClass('judge');
+                    $('#lr_SFCadd').attr('disabled', true);
+                    sefa.httpAsyncPost('/PPM/SAPSFCInterfaceTen/SynForm', {
+                        param: postData
+                    }, function(data) {
+                        console.log(data);
+                        if (data.code == sefa.httpCode.success) {
+                            sefa.alert.success('同步中,请等待……');
+                            $('#lr_SFCadd').removeClass('judge');
+                            $('#lr_SFCadd').attr('disabled', false);
+                        } else {
+                            sefa.alert.warning('同步失败！');
+                            $('#lr_SFCadd').removeClass('judge');
+                            $('#lr_SFCadd').attr('disabled', false);
+                        }
+                    });
+                });
+
+                // 请求 PlANDATE
+                $('#lr_syncPlanDate').on('click', function() {
+                    if (!departmentId) {
+                        sefa.alert.warning('请选择部门！');
+                        return false;
+                    }
+                    if (!project) {
+                        sefa.alert.warning('請選擇Project！');
+                        return false;
+                    }
+                    sefa.layerConfirm('是否确认请求！', function(res) {
+                        if (res) {
+                            sefa.postForm(top.$.rootUrl + '/PPM/NeedDataSMD/RequestNeedDataPlandate', {
+                                departmentId: departmentId,
+                                Project: project
+                            }, function() {
+                                $('#lr_syncPlanDate').attr('disabled', 'disabled');
+                                refreshGirdData();
+                            });
+                        }
+                    });
+                });
+
+            },
+
+            initGrid: function() {
+                $('#gridtable').lrAuthorizeJfGrid({
+                    url: top.$.rootUrl + '/PPM/NeedDataSMD/GetPageList',
+                    headData: [{
+                            label: "状态",
+                            name: "State",
+                            width: 50,
+                            align: "left",
+                            formatter: function(cellvalue) {
+                                if (cellvalue == '10') {
+                                    return cellvalue = '未排产';
+                                } else if (cellvalue == '20') {
+                                    return cellvalue = '已排产';
+                                } else if (cellvalue == '30') {
+                                    return cellvalue = '已锁定';
+                                } else if (cellvalue == '40') {
+                                    return cellvalue = '已发布';
+                                } else if (cellvalue == '50') {
+                                    return cellvalue = '冻结';
+                                } else if (cellvalue == '60') {
+                                    return cellvalue = '解冻';
+                                }
+                            }
+                        }, {
+                            label: "Project",
+                            name: "Project",
+                            width: 70,
+                            align: "left"
+                        }, {
+                            label: "Order_Receipt_Date",
+                            name: "Order_Receipt_Date",
+                            width: 140,
+                            align: "left",
+                            formatter: function(cellvalue) {
+                                return sefa.formatDate(cellvalue, 'yyyy-MM-dd');
+                            }
+                        }, {
+                            label: "Ship_to",
+                            name: "Ship_to",
+                            width: 90,
+                            align: "left"
+                        }, {
+                            label: "Region",
+                            name: "Region",
+                            width: 90,
+                            align: "left"
+                        }, {
+                            label: "Order_Type",
+                            name: "Order_Type",
+                            width: 80,
+                            align: "left"
+                        }, {
+                            label: "Route_Code",
+                            name: "Route_Code",
+                            width: 80,
+                            align: "left"
+                        }, {
+                            label: "PO_NO",
+                            name: "PO_NO",
+                            width: 90,
+                            align: "left"
+                        }, {
+                            label: "Priority",
+                            name: "Priority",
+                            width: 70,
+                            align: "left"
+                        }, {
+                            label: "Shipping_Mode",
+                            name: "Shipping_Mode",
+                            width: 100,
+                            align: "left"
+                        }, {
+                            label: "Platform",
+                            name: "Platform",
+                            width: 120,
+                            align: "left"
+                        }, {
+                            label: "Model",
+                            name: "Model",
+                            width: 200,
+                            align: "left"
+                        }, {
+                            label: "SKU",
+                            name: "SKU",
+                            width: 150,
+                            align: "left"
+                        }, {
+                            label: "QTY",
+                            name: "QTY",
+                            width: 50,
+                            align: "left"
+                        }, {
+                            label: "WO",
+                            name: "WO",
+                            width: 90,
+                            align: "left"
+                        }, {
+                            label: "Pallet_Type",
+                            name: "Pallet_Type",
+                            width: 100,
+                            align: "left"
+                        }, {
+                            label: "Ex_FactoryDeadline",
+                            name: "Ex_FactoryDeadline",
+                            width: 140,
+                            align: "left"
+                        }, {
+                            label: "New855DATE",
+                            name: "New855DATE",
+                            width: 140,
+                            align: "left",
+                            formatter: function(cellvalue) {
+                                return sefa.formatDate(cellvalue, 'yyyy-MM-dd');
+                            }
+                        }, {
+                            label: "Reason",
+                            name: "Reason",
+                            width: 200,
+                            align: "left"
+                        }, {
+                            label: "1st History reason",
+                            name: "One_History_Reason",
+                            width: 200,
+                            align: "left"
+                        }, {
+                            label: "History_Reason",
+                            name: "History_Reason",
+                            width: 200,
+                            align: "left"
+                        }, {
+                            label: "Remark",
+                            name: "Remark",
+                            width: 140,
+                            align: "left"
+                        }, {
+                            label: "Plan_Date",
+                            name: "Plan_Date",
+                            width: 140,
+                            align: "left",
+                            formatter: function(cellvalue) {
+                                return sefa.formatDate(cellvalue, 'yyyy-MM-dd');
+                            }
+                        }, {
+                            label: "Input_Date",
+                            name: "Input_Date",
+                            width: 140,
+                            align: "left",
+                            formatter: function(cellvalue) {
+                                return sefa.formatDate(cellvalue, 'yyyy-MM-dd');
+                            }
+                        }, {
+                            label: "Inputdate_Shift",
+                            name: "Inputdate_Shift",
+                            width: 140,
+                            align: "left",
+                            formatter: function(cellvalue) {
+                                return cellvalue == '1' ? '白班' : cellvalue == '2' ? '晚班' : '';
+                            }
+                        }, {
+                            label: "HFSO",
+                            name: "HFSO",
+                            width: 90,
+                            align: "left"
+                        }, {
+                            label: "RSD",
+                            name: "RSD",
+                            width: 140,
+                            align: "left"
+                        }, {
+                            label: "SOErrorMsg",
+                            name: "SOErrorMsg",
+                            width: 150,
+                            align: "left"
+                        }, {
+                            label: "LastEditDT",
+                            name: "LastEditDT",
+                            width: 140,
+                            align: "left"
+                        }, {
+                            label: "System",
+                            name: "System",
+                            width: 60,
+                            align: "left"
+                        }, {
+                            label: "SurplusQTY",
+                            name: "SurplusQTY",
+                            width: 60,
+                            align: "left"
+                        }, {
+                            label: "Order_Status",
+                            name: "Order_Status",
+                            width: 60,
+                            align: "left"
+                        }, {
+                            label: "ProjectType",
+                            name: "ProjectType",
+                            width: 60,
+                            align: "left"
+                        },
+
+                    ],
+                    mainId: 'ID',
+                    isPage: true,
+                    rows: 100,
+                    sidx: "",
+                    isMultiselect: true, //多选
+                    updateTimeStamp: 'UpdateTimeStamp',
+                    onSelectRow: function() {
+                        var _cols = $('#gridtable').jfGridGet('rowdata');
+                        console.log(_cols);
+                        for (var i = 0; i < _cols.length; i++) {
+                            var state = _cols[i].State
+                            if (state == 30 || state == 40) {
+                                $("#lr_freeze").addClass("judge");
+                                $("#lr_thaw").addClass("judge");
+                                return false
+                            } else {
+                                $("#lr_freeze").removeClass("judge");
+                                $("#lr_thaw").removeClass("judge");
+                            }
+                        }
+                    }
+                });
+                $('#gridtableTwo').lrAuthorizeJfGrid({
+                    url: top.$.rootUrl + '/PPM/NeedDataSMD/GetPageList',
+                    headData: [{
+                        label: "状态",
+                        name: "State",
+                        width: 50,
+                        align: "left",
+                        formatter: function(cellvalue) {
+                            if (cellvalue == '10') {
+                                return cellvalue = '未排产';
+                            } else if (cellvalue == '20') {
+                                return cellvalue = '已排产';
+                            } else if (cellvalue == '30') {
+                                return cellvalue = '已锁定';
+                            } else if (cellvalue == '40') {
+                                return cellvalue = '已发布';
+                            } else if (cellvalue == '50') {
+                                return cellvalue = '冻结';
+                            } else if (cellvalue == '60') {
+                                return cellvalue = '解冻';
+                            }
+                        }
+                    }, {
+                        label: "Project",
+                        name: "Project",
+                        width: 70,
+                        align: "left"
+                    }, {
+                        label: "B2B_Order_Date",
+                        name: "B2B_Order_Date",
+                        width: 140,
+                        align: "left"
+                    }, {
+                        label: "Order_Receipt_Date",
+                        name: "Order_Receipt_Date",
+                        width: 140,
+                        align: "left",
+                        formatter: function(cellvalue) {
+                            return sefa.formatDate(cellvalue, 'yyyy-MM-dd');
+                        }
+                    }, {
+                        label: "Ship_to",
+                        name: "Ship_to",
+                        width: 90,
+                        align: "left"
+                    }, {
+                        label: "GEO",
+                        name: "GEO",
+                        width: 50,
+                        align: "left"
+                    }, {
+                        label: "SUBGEO",
+                        name: "SUBGEO",
+                        width: 60,
+                        align: "left"
+                    }, {
+                        label: "Region",
+                        name: "Region",
+                        width: 90,
+                        align: "left"
+                    }, {
+                        label: "Order_Type",
+                        name: "Order_Type",
+                        width: 80,
+                        align: "left"
+                    }, {
+                        label: "Route_Code",
+                        name: "Route_Code",
+                        width: 80,
+                        align: "left"
+                    }, {
+                        label: "PO_NO",
+                        name: "PO_NO",
+                        width: 90,
+                        align: "left"
+                    }, {
+                        label: "Priority",
+                        name: "Priority",
+                        width: 70,
+                        align: "left"
+                    }, {
+                        label: "Shipping_Mode",
+                        name: "Shipping_Mode",
+                        width: 100,
+                        align: "left"
+                    }, {
+                        label: "Platform",
+                        name: "Platform",
+                        width: 120,
+                        align: "left"
+                    }, {
+                        label: "Model",
+                        name: "Model",
+                        width: 200,
+                        align: "left"
+                    }, {
+                        label: "SKU",
+                        name: "SKU",
+                        width: 150,
+                        align: "left"
+                    }, {
+                        label: "QTY",
+                        name: "QTY",
+                        width: 50,
+                        align: "left"
+                    }, {
+                        label: "WO",
+                        name: "WO",
+                        width: 90,
+                        align: "left"
+                    }, {
+                        label: "Pallet_Type",
+                        name: "Pallet_Type",
+                        width: 100,
+                        align: "left"
+                    }, {
+                        label: "Ex_FactoryDeadline",
+                        name: "Ex_FactoryDeadline",
+                        width: 140,
+                        align: "left"
+                    }, {
+                        label: "New855DATE",
+                        name: "New855DATE",
+                        width: 140,
+                        align: "left",
+                        formatter: function(cellvalue) {
+                            return sefa.formatDate(cellvalue, 'yyyy-MM-dd');
+                        }
+                    }, {
+                        label: "Reason",
+                        name: "Reason",
+                        width: 200,
+                        align: "left"
+                    }, {
+                        label: "1st History reason",
+                        name: "One_History_Reason",
+                        width: 200,
+                        align: "left"
+                    }, {
+                        label: "History_Reason",
+                        name: "History_Reason",
+                        width: 200,
+                        align: "left"
+                    }, {
+                        label: "Remark",
+                        name: "Remark",
+                        width: 140,
+                        align: "left"
+                    }, {
+                        label: "Plan_Date",
+                        name: "Plan_Date",
+                        width: 140,
+                        align: "left",
+                        formatter: function(cellvalue) {
+                            return sefa.formatDate(cellvalue, 'yyyy-MM-dd');
+                        }
+                    }, {
+                        label: "Input_Date",
+                        name: "Input_Date",
+                        width: 140,
+                        align: "left",
+                        formatter: function(cellvalue) {
+                            return sefa.formatDate(cellvalue, 'yyyy-MM-dd');
+                        }
+                    }, {
+                        label: "Inputdate_Shift",
+                        name: "Inputdate_Shift",
+                        width: 140,
+                        align: "left",
+                        formatter: function(cellvalue) {
+                            return cellvalue == '1' ? '白班' : cellvalue == '2' ? '晚班' : '';
+                        }
+                    }, {
+                        label: "HFSO",
+                        name: "HFSO",
+                        width: 90,
+                        align: "left"
+                    }, {
+                        label: "RSD",
+                        name: "RSD",
+                        width: 140,
+                        align: "left"
+                    }, {
+                        label: "SpecialBid",
+                        name: "SpecialBid",
+                        width: 110,
+                        align: "left"
+                    }, {
+                        label: "WE19",
+                        name: "WE19",
+                        width: 50,
+                        align: "left"
+                    }, {
+                        label: "Carrier",
+                        name: "Carrier",
+                        width: 50,
+                        align: "left"
+                    }, {
+                        label: "BBY",
+                        name: "BBY",
+                        width: 50,
+                        align: "left"
+                    }, {
+                        label: "Dixon",
+                        name: "Dixon",
+                        width: 50,
+                        align: "left"
+                    }, {
+                        label: "item_tie",
+                        name: "item_tie",
+                        width: 50,
+                        align: "left"
+                    }, {
+                        label: "Deliver_Group_NO",
+                        name: "Deliver_Group_NO",
+                        width: 50,
+                        align: "left"
+                    }, {
+                        label: "polineno",
+                        name: "polineno",
+                        width: 50,
+                        align: "left"
+                    }, {
+                        label: "potype",
+                        name: "potype",
+                        width: 50,
+                        align: "left"
+                    }, {
+                        label: "custsalesorg",
+                        name: "custsalesorg",
+                        width: 90,
+                        align: "left"
+                    }, {
+                        label: "ShortagePN",
+                        name: "ShortagePN",
+                        width: 90,
+                        align: "left"
+                    }, {
+                        label: "ShortagePNdescription",
+                        name: "ShortagePNdescription",
+                        width: 90,
+                        align: "left"
+                    }, {
+                        label: "RecoverySchedule",
+                        name: "RecoverySchedule",
+                        width: 140,
+                        align: "left"
+                    }, {
+                        label: "NewMTM",
+                        name: "NewMTM",
+                        width: 70,
+                        align: "left"
+                    }, {
+                        label: "NEW_GEO",
+                        name: "NEW_GEO",
+                        width: 70,
+                        align: "left"
+                    }, {
+                        label: "SurplusQTY",
+                        name: "SurplusQTY",
+                        width: 60,
+                        align: "left"
+                    }, {
+                        label: "Order_Status",
+                        name: "Order_Status",
+                        width: 60,
+                        align: "left"
+                    }, {
+                        label: "ProjectType",
+                        name: "ProjectType",
+                        width: 60,
+                        align: "left"
+                    }, ],
+                    mainId: 'ID',
+                    isPage: true,
+                    rows: 100,
+                    sidx: "",
+                    isMultiselect: true, //多选
+                    updateTimeStamp: 'UpdateTimeStamp',
+                    onSelectRow: function() {
+                        var _cols = $('#gridtable').jfGridGet('rowdata');
+                        console.log(_cols);
+                        for (var i = 0; i < _cols.length; i++) {
+                            var state = _cols[i].State
+                            if (state == 30 || state == 40) {
+                                $("#lr_freeze").addClass("judge");
+                                $("#lr_thaw").addClass("judge");
+                                return false
+                            } else {
+                                $("#lr_freeze").removeClass("judge");
+                                $("#lr_thaw").removeClass("judge");
+                            }
+                        }
+                    }
+                });
+                page.search();
+            },
+            initNotify: function() { //初始化提示
+                $('#notifyIndex').lrNotify({
+                    key: 'NeedDataSMD',
+                    isShowMsg: true,
+                    callback: function(msg) {
+                        if (msg) {
+                            $('#lr_add').removeAttr('disabled');
+                            $('#lr_sync').removeAttr('disabled');
+                            $('#lr_syncPlanDate').removeAttr('disabled');
+
+                            var json = JSON.parse(msg);
+                            if (json.code * 1 == 0) {
+                                top.layer.open({
+                                    type: 1,
+                                    area: ['420px', '240px'], //宽高
+                                    content: json.message,
+                                });
+                                //sefa.alert.success(json.message);
+                                refreshGirdData();
+                            } else {
+                                top.layer.open({
+                                    type: 1,
+                                    area: ['420px', '240px'], //宽高
+                                    content: json.message,
+                                });
+                                //sefa.alert.error();
+                            }
+                        }
+                    }
+                });
+            },
+            search: function(param) {
+                param = param || {};
+                param.DepartMent_Id = departmentId;
+                param.Project = project;
+                param.Platform = $("#txt_Platform").val();
+                param.SKU = $("#txt_SKU").val();
+                param.WO = $("#txt_WO").val();
+                param.Region = Region;
+                param.Ship_to = Shipto;
+                param.StaterDate = $("#Need_StaterDate").val();
+                param.EndDate = $("#Need_EndDate").val();
+                param.EXStaterDate = $("#Need_EXStaterDate").val();
+                param.EXEndDate = $("#Need_EXEndDate").val();
+                param.State = State;
+                param.Order_Status = OrderType;
+                param.ProjectType = $("#ProjectType").val();
+                //param.Order_Type = OrderType;
+                if (project == 'HP') {
+                    $('#gridtable').removeClass('judge');
+                    $('#gridtableTwo').addClass('judge');
+                    $('#gridtable').jfGridSet('reload', {
+                        queryJson: JSON.stringify(param)
+                    });
+                } else if (project == 'Lenovo') {
+                    $('#gridtableTwo').removeClass('judge');
+                    $('#gridtable').addClass('judge');
+                    $('#gridtableTwo').jfGridSet('reload', {
+                        queryJson: JSON.stringify(param)
+                    });
+                }
+
+            },
+            tablesToExcel: function(array, StName, filename) {
+                var uri = 'data:application/vnd.ms-excel;base64,',
+                    html_start = `<html xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">`,
+                    template_ExcelWorksheet = `<x:ExcelWorksheet><x:Name>{SheetName}</x:Name><x:WorksheetSource HRef="sheet{SheetIndex}.htm"/></x:ExcelWorksheet>`,
+                    template_ListWorksheet = `<o:File HRef="sheet{SheetIndex}.htm"/>`,
+                    template_HTMLWorksheet = `
+------=_NextPart_dummy
+Content-Location: sheet{SheetIndex}.htm
+Content-Type: text/html; charset=utf-8
+
+` + html_start + `
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <link id="Main-File" rel="Main-File" href="../WorkBook.htm">
+    <link rel="File-List" href="filelist.xml">
+</head>
+<body>{SheetContent}</body>
+</html>`,
+                    template_WorkBook = `MIME-Version: 1.0
+X-Document-Type: Workbook
+Content-Type: multipart/related; boundary="----=_NextPart_dummy"
+
+------=_NextPart_dummy
+Content-Location: WorkBook.htm
+Content-Type: text/html; charset=utf-8
+
+` + html_start + `
+<head>
+<meta name="Excel Workbook Frameset">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="File-List" href="filelist.xml">
+<!--[if gte mso 9]><xml>
+ <x:ExcelWorkbook>
+    <x:ExcelWorksheets>{ExcelWorksheets}</x:ExcelWorksheets>
+    <x:ActiveSheet>0</x:ActiveSheet>
+ </x:ExcelWorkbook>
+</xml><![endif]-->
+</head>
+<frameset>
+    <frame src="sheet0.htm" name="frSheet">
+    <noframes><body><p>This page uses frames, but your browser does not support them.</p></body></noframes>
+</frameset>
+</html>
+{HTMLWorksheets}
+Content-Location: filelist.xml
+Content-Type: text/xml; charset="utf-8"
+
+<xml xmlns:o="urn:schemas-microsoft-com:office:office">
+    <o:MainFile HRef="../WorkBook.htm"/>
+    {ListWorksheets}
+    <o:File HRef="filelist.xml"/>
+</xml>
+------=_NextPart_dummy--
+`,
+                    base64 = function(s) {
+                        return window.btoa(unescape(encodeURIComponent(s)))
+                    },
+                    format = function(s, c) {
+                        return s.replace(/{(\w+)}/g, function(m, p) {
+                            return c[p];
+                        })
+                    }
+
+                var context_WorkBook = {
+                    ExcelWorksheets: '',
+                    HTMLWorksheets: '',
+                    ListWorksheets: ''
+                };
+                //var tables = jQuery(tables);
+                //var Array = new Array();
+                //Array.push(aa);
+                //Array.push(bb);
+                $.each(array, function(SheetIndex, item) {
+                    var SheetName = StName[SheetIndex];
+                    //if ($.trim(SheetName) === '') {
+                    //    SheetName = 'Sheet' + SheetIndex;
+                    //}
+                    context_WorkBook.ExcelWorksheets += format(template_ExcelWorksheet, {
+                        SheetIndex: SheetIndex,
+                        SheetName: SheetName
+                    });
+                    context_WorkBook.HTMLWorksheets += format(template_HTMLWorksheet, {
+                        SheetIndex: SheetIndex,
+                        SheetContent: item
+                    });
+                    context_WorkBook.ListWorksheets += format(template_ListWorksheet, {
+                        SheetIndex: SheetIndex
+                    });
+                });
+
+                var link = document.createElement("a");
+
+                var binaryData = [];
+                binaryData.push(format(template_WorkBook, context_WorkBook));
+                var blobUrl = window.URL.createObjectURL(new Blob(binaryData, {
+                    type: uri
+                }));
+                //link.href = uri + base64(format(template_WorkBook, context_WorkBook));
+                link.href = blobUrl;
+                link.download = filename || 'Workbook.xls';
+                link.target = '_blank';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                console.log(link.href);
+
+            }
+        };
+
+        // 保存数据后回调刷新
+        refreshGirdData = function() {
+            if (project == 'HP') {
+                $('#gridtable').jfGridSet('reload');
+            } else if (project == 'Lenovo') {
+                $('#gridtableTwo').jfGridSet('reload');
+            }
+        }
+
+        page.init();
+    }
+
+    /**
+     * 通过索引获取对应的Excel列名
+     * 索引从0开始，返回形如 A,B,C,...,Z,AA,AB,...,AZ,BA,...,ZZ,AAA,AAB,......
+     */
+    function getExcelColumnName(index) {
+        var colName = '';
+        if (index >= 26) {
+            colName = getExcelColumnName(index / 26 - 1);
+            colName += String.fromCharCode(65 + index % 26);
+        } else {
+            colName += String.fromCharCode(65 + index);
+        }
+        return colName;
+    };
+</script>

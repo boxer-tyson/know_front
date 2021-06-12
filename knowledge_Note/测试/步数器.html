@@ -1,0 +1,41 @@
+<div class="stepper">
+    <!-- Minus button -->
+    <button class="stepper__button">-</button>
+
+    <!-- Input container -->
+    <div class="stepper__content">
+        <input type="text" class="stepper__input" />
+    </div>
+
+    <!-- Plus button -->
+    <button class="stepper__button">+</button>
+</div>
+<style>
+    .stepper {
+        display: flex;
+        /* Border */
+        border: 1px solid rgba(0, 0, 0, .3);
+        /* Size */
+        height: 32px;
+        width: 128px;
+    }
+    
+    .stepper__button {
+        /* Center the content */
+        align-items: center;
+        display: flex;
+        justify-content: center;
+        /* Size */
+        width: 32px;
+    }
+    
+    .stepper__content {
+        flex: 1;
+    }
+    
+    .stepper__input {
+        /* Take full size of its container */
+        height: 100%;
+        width: 100%;
+    }
+</style>

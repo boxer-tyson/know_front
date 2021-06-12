@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <div desc='产出' style="margin-top:20px;">产出</div>
+    <button>btnA</button>
+
+    <!-- <button>btnB</button> -->
+</body>
+
+</html>
+<style>
+    button {
+        position: absolute;
+    }
+</style>
+
+<script>
+    //闭包: 子函数可以访问其它函数作用域的数据
+    arr = [1, 45, 43, 6, 7, 2323]
+
+    function between(a, b) {
+        return function(v) {
+            return v >= a && v <= b
+        }
+    }
+    console.table(arr.filter(between(3, 89)))
+
+    //小案例
+    let btns = document.querySelectorAll('button')
+    btns.forEach(function(item) {
+        let bind = false
+        item.addEventListener('click', function() {
+            if (!bind) {
+                bind = true;
+                let left = 1;
+                setInterval(function() {
+                    item.style.left = left++ + 'px'
+                }, 100)
+            }
+        })
+    })
+
+    //解决闭包内存泄漏问题
+    let divs = document.querySelectorAll('div')
+    divs.forEach(function(item) {
+        let desc = item.getAttribute('desc')
+        item.addEventListener('click', function() {
+                console.log(desc)
+            })
+            //不需要
+        item = null
+    })
+</script>

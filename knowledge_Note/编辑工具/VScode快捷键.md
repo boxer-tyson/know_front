@@ -1,0 +1,1 @@
+ctrl_shift+k 删除一整行
